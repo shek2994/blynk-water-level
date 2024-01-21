@@ -16,9 +16,20 @@ and connect it to Blynk.
 Don't forget to change WIFI_SSID, WIFI_PASS and BLYNK_AUTH ;)
 """
 
+'''Micropython import modules'''
+from machine import Pin, ADC, PWM, Timer
+import machine
+
+'''blynk cloud connected import modules'''
 import BlynkLib
 import network
-import machine
+from BlynkTimer import BlynkTimer
+
+'''app utils modules'''
+import random
+
+'''for HW sensor v/s random'''
+_SIMUL = False
 
 WIFI_SSID = 'YourWiFiNetwork'
 WIFI_PASS = 'YourWiFiPassword'
@@ -45,11 +56,40 @@ def blynk_connected(ping):
 def blynk_disconnected():
     print('Blynk disconnected')
 
+@blynk.on("V3")
+def v3_write_handler(value):
+    print('Current slider value: {}'.format(value[0]))
+
+
+'''laser distance sensor section'''
+pot = ADC(Pin(34))
+pot.atten(ADC.ATTN_11DB)
+def read_adc():
+    nVal = pot.read()
+    vVal = nVal*3.3/4095 - 0.03
+    print("Voltage", vVal)
+    return vVal
+
+'''data push section'''
+timer = BlynkTimer()
+
+def send_temp_data():
+    if _SIMUL :
+        val = random.uniform(1.5, 10.9)
+    else:
+        val = read_adc()
+    print(val)
+    blynk.virtual_write(4, val)
+
+# Add Timers
+timer.set_timeout(2, send_temp_data)
+timer.set_interval(1.2, send_temp_data)
+
 def runLoop():
     while True:
         blynk.run()
+        timer.run()
         machine.idle()
-
 # Run blynk in the main thread
 runLoop()
 
