@@ -1,5 +1,5 @@
-#import BlynkLibESP32 as BlynkLib   # for ESP32
-import BlynkLib as BlynkLib
+# import BlynkLibESP32 as BlynkLib   # for ESP32 (Did not work 10-07-2024)
+import BlynkLib as BlynkLib  # worked on 10-07-2024 See microfost notes
 
 
 BLYNK_AUTH="ntDBx7-dkNt7gT3A6nTx4xoKBhwEw71F"
